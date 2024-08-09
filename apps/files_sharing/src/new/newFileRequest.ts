@@ -4,47 +4,31 @@
  */
 import type { Entry, Folder, Node } from '@nextcloud/files'
 
+import { defineAsyncComponent } from 'vue'
+import { spawnDialog } from '@nextcloud/dialogs'
 import { translate as t } from '@nextcloud/l10n'
-import Vue, { defineAsyncComponent } from 'vue'
 import FileUploadSvg from '@mdi/svg/svg/file-upload.svg?raw'
+
+import Config from '../services/ConfigService'
+const sharingConfig = new Config()
 
 const NewFileRequestDialogVue = defineAsyncComponent(() => import('../components/NewFileRequestDialog.vue'))
 
+export const EntryId = 'file-request'
+
 export const entry = {
-	id: 'file-request',
-	displayName: t('files', 'Create new file request'),
+	id: EntryId,
+	displayName: t('files_sharing', 'Create file request'),
 	iconSvgInline: FileUploadSvg,
-	order: 30,
+	order: 10,
 	enabled(): boolean {
-		// TODO: determine requirements
-		// 1. user can share the root folder
-		// 2. OR user can create subfolders ?
-		return true
+		// We will check for the folder permission on the dialog
+		return sharingConfig.isPublicShareAllowed
 	},
 	async handler(context: Folder, content: Node[]) {
-		// Create document root
-		const mountingPoint = document.createElement('div')
-		mountingPoint.id = 'file-request-dialog'
-		document.body.appendChild(mountingPoint)
-
-		// Init vue app
-		const NewFileRequestDialog = new Vue({
-			name: 'NewFileRequestDialogRoot',
-			render: (h) => h(
-				NewFileRequestDialogVue,
-				{
-					props: {
-						context,
-						content,
-					},
-					on: {
-						close: () => {
-							NewFileRequestDialog.$destroy()
-						},
-					},
-				},
-			),
-			el: mountingPoint,
+		spawnDialog(NewFileRequestDialogVue, {
+			context,
+			content,
 		})
 	},
 } as Entry

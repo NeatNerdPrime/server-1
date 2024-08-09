@@ -25,8 +25,8 @@
 			</div>
 
 			<!-- clipboard -->
-			<NcActions v-if="share && !isEmailShareType && share.token" ref="copyButton" class="sharing-entry__copy">
-				<NcActionButton	:title="copyLinkTooltip"
+			<NcActions v-if="share && (!isEmailShareType || isFileRequest) && share.token" ref="copyButton" class="sharing-entry__copy">
+				<NcActionButton :title="copyLinkTooltip"
 					:aria-label="copyLinkTooltip"
 					@click.prevent="copyLink">
 					<template #icon>
@@ -241,7 +241,7 @@ import SharingEntryQuickShareSelect from './SharingEntryQuickShareSelect.vue'
 
 import ExternalShareAction from './ExternalShareAction.vue'
 import GeneratePassword from '../utils/GeneratePassword.ts'
-import Share from '../models/Share.js'
+import Share from '../models/Share.ts'
 import SharesMixin from '../mixins/SharesMixin.js'
 import ShareDetails from '../mixins/ShareDetails.js'
 import { getLoggerBuilder } from '@nextcloud/logger'
